@@ -1,0 +1,38 @@
+# CiteWise Project Rules - Senior Legal AI Architect
+
+## 1. Tech Stack & Architecture
+- Backend: FastAPI (Python)
+- Frontend: Streamlit (RTL/Hebrew Support)
+- Vector DB: Milvus Lite (local .db file)
+- Embeddings: Ollama (nomic-embed-text)
+- LLM: Ollama (llama3)
+- Reranker: FlashRank
+- Structure: Modular (ingest/, retrieval/, generation/, api/, ui/)
+
+## 2. Legal Data Processing (CRITICAL)
+- **Unified Extraction**: Consistent text extraction for PDF/Word.
+- **Cleaning**: 
+    - Remove: Page numbers, recurring headers/footers, auto-line numbers, watermarks.
+    - Normalize: Convert "smart" quotes to standard, fix double spaces, unify Hebrew punctuation (Gershayim).
+- **Preservation**: 
+    - NEVER remove punctuation or section numbering (e.g., 1.1, (א), (ב)).
+    - Use double newlines as primary chunk boundaries to preserve legal clauses.
+    - Join broken lines within the same paragraph, but keep blank lines between clauses.
+- **Definitions Strategy**:
+    - Detect "Definitions" sections at the start of documents.
+    - Index definitions separately with metadata `{is_definition: true}`.
+    - During retrieval, cross-reference query terms with the definitions index.
+
+## 3. Technical Standards (RAG)
+- **Chunking**: RecursiveCharacterTextSplitter (Size: 1000 chars, Overlap: 150).
+- **Indexing**: Milvus HNSW index.
+- **Metadata**: Every vector must store `{source_filename, page_number, chunk_id, is_definition}`.
+- **Sync**: Support real-time folder watching in 'data/' folder (Handle Add/Delete).
+
+## 4. Interaction & UI
+- **Role**: Senior Israeli Legal AI. Formal, precise, and professional tone.
+- **Language**: Hebrew for all UI elements and AI responses.
+- **Search**: Hybrid Search (Vector + Keyword) + FlashRank re-ranking.
+- **Citations**: Every claim must cite "Source: [filename], Page: [number]".
+- **History**: Maintain chat context for follow-up questions.
+- **Mobile**: Ensure Streamlit UI is responsive and RTL compliant.

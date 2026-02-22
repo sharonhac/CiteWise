@@ -1,0 +1,35 @@
+# --- Core Framework ---
+fastapi
+uvicorn
+python-dotenv
+python-multipart
+apscheduler
+watchdog
+requests
+
+# --- LangChain (PINNED & CONSISTENT) ---
+langchain==0.3.0
+langchain-core==0.3.0
+langchain-community==0.3.0
+langchain-text-splitters==0.3.0
+langchain-ollama==0.2.0
+# !! DO NOT ADD langchain-milvus !!
+# langchain-milvus imports pymilvus.orm.connections at package load time,
+# which crashes on any local file URI with ConnectionConfigException.
+# CiteWise uses pymilvus.MilvusClient directly — no langchain-milvus needed.
+
+# --- AI Models ---
+ollama
+openai
+anthropic
+
+# --- Data & Vector Processing ---
+numpy==1.26.4
+pymilvus
+pypdf
+python-docx
+docx2txt
+flashrank
+
+# --- UI ---
+streamlit
