@@ -1,4 +1,4 @@
-# ⚖️ CiteWise — מערכת RAG משפטית מתקדמת
+#  CiteWise
 
 > **Senior Israeli Attorney AI** — A modular, high-precision RAG system built for Israeli law firms.
 
@@ -88,80 +88,3 @@ After starting the API, trigger a manual sync to index your documents:
   curl -X POST http://localhost:8000/sync/blocking
   ```
 
----
-
-## 🌐 API Endpoints
-
-| Method | Endpoint          | Description                          |
-|--------|-------------------|--------------------------------------|
-| GET    | `/health`         | Health check                         |
-| GET    | `/status`         | Index statistics                     |
-| POST   | `/query`          | Streaming RAG query                  |
-| POST   | `/sync`           | Background folder sync               |
-| POST   | `/sync/blocking`  | Blocking sync with full report       |
-| POST   | `/upload`         | Upload & index a new document        |
-
----
-
-## 🔀 Switching LLM Providers
-
-Edit `.env`:
-
-```dotenv
-# Local (default)
-LLM_PROVIDER=ollama
-LLM_MODEL=llama3
-
-# OpenAI
-LLM_PROVIDER=openai
-LLM_MODEL=gpt-4o
-OPENAI_API_KEY=sk-...
-
-# Anthropic
-LLM_PROVIDER=anthropic
-LLM_MODEL=claude-opus-4-5
-ANTHROPIC_API_KEY=sk-ant-...
-```
-
----
-
-## 🏗️ Architecture
-
-```
-User Question (Hebrew)
-        │
-        ▼
-  [retrieval/retriever.py]
-        │
-        ├─→ Semantic Search (Milvus HNSW)  ─┐
-        ├─→ Keyword Search (BM25)           ├─→ Merge & Dedupe
-        └─→ Definitions Index Search        ─┘
-                │
-                ▼
-        [FlashRank Reranking]
-                │
-                ▼
-        [Context Block + Citations]
-                │
-                ▼
-      [generation/prompt.py]  ← Hebrew Legal System Prompt
-                │
-                ▼
-        [generation/llm.py]   ← Ollama / OpenAI / Anthropic
-                │
-                ▼
-     Streaming Hebrew Answer + Citations
-```
-
----
-
-## 📋 Key Design Decisions
-
-| Decision | Rationale |
-|---|---|
-| Two-tier vector index | Definitions resolved separately → consistent terminology |
-| BM25 + Semantic | Hybrid captures both exact legal terms and semantic meaning |
-| FlashRank reranking | Cross-encoder precision without heavy GPU requirement |
-| Milvus Lite (.db file) | Fully local, no Docker/server required |
-| APScheduler 30-min sync | Hands-free indexing of new documents |
-| `\n\n` primary chunk boundary | Preserves Hebrew legal clause structure |
